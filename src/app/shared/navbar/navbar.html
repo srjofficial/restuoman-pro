@@ -1,0 +1,171 @@
+<nav
+    class="fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 lg:h-20 text-gray-900">
+            <a routerLink="/"
+                class="mr-4 cursor-pointer py-1.5 lg:ml-2 font-bold text-xl tracking-tight text-gray-800 flex items-center gap-2">
+                <div
+                    class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xl">
+                    R
+                </div>
+                <span>Restuoman<span class="text-blue-600">Pro</span></span>
+            </a>
+
+            <div class="hidden lg:block">
+                <ul class="mt-4 mb-6 p-0 lg:mt-0 lg:mb-0 lg:flex lg:flex-row lg:items-center lg:gap-6 list-none">
+                    <li>
+                        <a routerLink="/home"
+                            class="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900 hover:text-blue-600 transition-colors">Home</a>
+                    </li>
+
+                    <!-- Mega Menu Trigger -->
+                    <li class="relative group">
+                        <button (click)="toggleMenu()"
+                            class="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900 hover:text-blue-600 transition-colors bg-transparent border-none cursor-pointer">
+                            Resources
+                            <ng-icon name="heroChevronDown" class="transition-transform h-3 w-3"
+                                [class.rotate-180]="isMenuOpen"></ng-icon>
+                        </button>
+
+                        <!-- Mega Menu Dropdown -->
+                        <div *ngIf="isMenuOpen"
+                            class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-[500px] bg-white rounded-xl shadow-lg border border-gray-100 p-4 z-50 grid grid-cols-3 gap-2 outline-none">
+                            <a href="#" *ngFor="let item of navListMenuItems" class="block text-decoration-none">
+                                <div
+                                    class="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <div
+                                        class="flex items-center justify-center rounded-lg bg-gray-50 p-2 text-blue-600">
+                                        <ng-icon [name]="item.icon" class="h-6 w-6"></ng-icon>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-sm font-bold text-gray-900 mb-0">{{ item.title }}</h6>
+                                        <p class="text-xs font-medium text-gray-500 mt-1">{{ item.description }}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </li>
+
+                    <li>
+                        <a href="#"
+                            class="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900 hover:text-blue-600 transition-colors">Contact
+                            Us</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="gap-2 flex items-center">
+                <!-- Auth Buttons / Profile -->
+                <ng-container *ngIf="currentUser$ | async as user; else loginButtons">
+                    <div class="flex items-center gap-4 relative group">
+                        <!-- Profile Link -->
+                        <a routerLink="/profile"
+                            class="flex items-center gap-3 hover:bg-gray-50 p-1 pr-3 rounded-full transition-colors cursor-pointer border border-transparent hover:border-gray-200">
+                            <div class="text-right hidden sm:block">
+                                <div class="text-sm font-bold text-gray-900" *ngIf="currentProfile$ | async as profile">
+                                    <span *ngIf="profile.username; else noUsername">{{ profile.username }}</span>
+                                    <ng-template #noUsername>
+                                        <span class="text-blue-600 underline">Set username</span>
+                                    </ng-template>
+                                </div>
+                                <div class="text-xs text-gray-500">{{ user.email }}</div>
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-blue-500 relative flex-shrink-0">
+                                <img *ngIf="avatarUrl; else defaultIcon" [src]="avatarUrl" alt="Avatar"
+                                    class="w-full h-full object-cover">
+                                <ng-template #defaultIcon>
+                                    <span
+                                        class="absolute inset-0 flex items-center justify-center text-gray-400 bg-gray-100">
+                                        <mat-icon class="scale-125">person</mat-icon>
+                                    </span>
+                                </ng-template>
+                            </div>
+                        </a>
+
+                        <!-- Sign Out Button -->
+                        <button mat-icon-button color="warn" (click)="signOut()" title="Sign Out"
+                            class="hover:bg-red-50 transition-colors">
+                            <mat-icon>logout</mat-icon>
+                        </button>
+                    </div>
+                </ng-container>
+
+                <ng-template #loginButtons>
+                    <div class="hidden lg:flex gap-2">
+                        <a routerLink="/login"
+                            class="text-gray-900 hover:bg-gray-100 font-medium rounded-lg text-sm px-4 py-2 hover:text-blue-600 transition-colors">Log
+                            In</a>
+                        <a routerLink="/login"
+                            class="text-white bg-gray-900 hover:bg-gray-800 font-medium rounded-lg text-sm px-4 py-2 shadow-md hover:shadow-lg transition-all">Sign
+                            In</a>
+                    </div>
+                </ng-template>
+
+                <!-- Mobile Menu Button -->
+                <button class="lg:hidden p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                    (click)="toggleMobileMenu()">
+                    <ng-icon [name]="isMobileMenuOpen ? 'heroXMark' : 'heroBars3'" class="h-6 w-6"></ng-icon>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Collapse -->
+        <div class="block lg:hidden overflow-hidden transition-all duration-300 ease-in-out"
+            [class.max-h-0]="!isMobileMenuOpen" [class.max-h-[1000px]]="isMobileMenuOpen">
+            <div class="p-4 space-y-4 border-t border-gray-100 mt-2 bg-white rounded-xl shadow-inner">
+                <a routerLink="/home" (click)="closeMenu()"
+                    class="block font-medium text-gray-900 hover:text-blue-600 py-2">Home</a>
+
+                <!-- Mobile Dropdown -->
+                <div class="space-y-2">
+                    <div class="font-medium text-gray-900 py-2 flex items-center justify-between cursor-pointer"
+                        (click)="toggleMenu()">
+                        Resources
+                        <ng-icon name="heroChevronDown" class="h-4 w-4 transition-transform"
+                            [class.rotate-180]="isMenuOpen"></ng-icon>
+                    </div>
+                    <div *ngIf="isMenuOpen" class="pl-4 space-y-2 border-l-2 border-gray-100">
+                        <a href="#" *ngFor="let item of navListMenuItems" class="block py-2">
+                            <div class="flex items-center gap-3">
+                                <div class="p-1 bg-gray-50 text-blue-600 rounded">
+                                    <ng-icon [name]="item.icon" class="h-4 w-4"></ng-icon>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-sm text-gray-900">{{ item.title }}</div>
+                                    <div class="text-xs text-gray-500">{{ item.description }}</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <a href="#" (click)="closeMenu()"
+                    class="block font-medium text-gray-900 hover:text-blue-600 py-2">Contact
+                    Us</a>
+
+                <!-- Authenticated Mobile Actions -->
+                <div class="pt-4 border-t border-gray-100 flex flex-col gap-2" *ngIf="currentUser$ | async">
+                    <a routerLink="/profile" (click)="closeMenu()"
+                        class="block font-medium text-gray-900 hover:text-blue-600 py-2 px-1">
+                        My Profile
+                    </a>
+                    <button (click)="signOut(); closeMenu()"
+                        class="w-full text-left py-2 font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2 border-none bg-transparent cursor-pointer">
+                        <mat-icon class="scale-75">logout</mat-icon>
+                        Sign Out
+                    </button>
+                </div>
+
+                <div class="pt-4 border-t border-gray-100 flex flex-col gap-2" *ngIf="!(currentUser$ | async)">
+                    <a routerLink="/login" (click)="closeMenu()"
+                        class="w-full text-center py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50">Log
+                        In</a>
+                    <a routerLink="/login" (click)="closeMenu()"
+                        class="w-full text-center py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 shadow-md">Sign
+                        In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

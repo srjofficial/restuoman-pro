@@ -1,0 +1,16 @@
+/* Employer Dashboard Styles */
+mat-card {
+    transition: all 0.3s ease;
+}
+
+mat-card:hover {
+    transform: translateY(-2px);
+}
+
+.scale-150 {
+    transform: scale(1.5);
+}
+
+button mat-icon {
+    margin-right: 0;
+}

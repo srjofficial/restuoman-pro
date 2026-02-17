@@ -1,0 +1,187 @@
+<div class="min-h-screen bg-gray-50 pb-12">
+    <!-- Cover Image -->
+    <div class="relative h-80 w-full overflow-hidden">
+        <div class="absolute inset-0 bg-gray-900/40 z-10"></div>
+        <img src="https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80"
+            alt="background-image" class="h-full w-full object-cover object-center" />
+    </div>
+
+    <!-- Main Container -->
+    <div class="relative mx-auto -mt-24 w-full max-w-5xl px-4 z-20">
+
+        <!-- Main Card -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+
+            <!-- Header Section -->
+            <div
+                class="p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-end gap-6 border-b border-gray-100 pb-8">
+                <!-- Avatar -->
+                <div class="relative group shrink-0">
+                    <div
+                        class="h-32 w-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100 flex items-center justify-center relative z-10">
+                        <img *ngIf="avatarUrl" [src]="avatarUrl" alt="Avatar" class="h-full w-full object-cover" />
+                        <mat-icon *ngIf="!avatarUrl" class="text-gray-400 scale-[3]">person</mat-icon>
+                    </div>
+                    <label for="avatar-upload"
+                        class="absolute bottom-1 right-1 h-10 w-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg cursor-pointer hover:bg-blue-700 transition-colors z-20 border-2 border-white">
+                        <mat-icon class="scale-75">edit</mat-icon>
+                    </label>
+                    <input type="file" id="avatar-upload" hidden accept="image/*" (change)="uploadAvatar($event)"
+                        [disabled]="loading" />
+                </div>
+
+                <!-- User Info -->
+                <div class="text-center sm:text-left flex-1 pb-2">
+                    <h1 class="text-3xl font-bold text-gray-900 leading-tight">
+                        {{ profileForm.get('username')?.value || 'User' }}
+                    </h1>
+                    <p class="text-gray-500 font-medium">
+                        {{ (currentUser$ | async)?.email }}
+                    </p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-3 pb-2 w-full sm:w-auto" *ngIf="currentProfile$ | async as profile">
+                    <button *ngIf="profile.role === 'admin' || profile.role === 'employer'"
+                        (click)="router.navigate([profile.role === 'admin' ? '/admin' : '/employer'])"
+                        class="flex-1 sm:flex-none justify-center px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2 transform hover:scale-105 active:scale-95"
+                        data-aos="fade-left" data-aos-delay="100">
+                        <mat-icon class="scale-75 h-5 w-5 flex items-center justify-center">dashboard</mat-icon>
+                        {{ profile.role === 'admin' ? 'Admin Dashboard' : 'Employer Dashboard' }}
+                    </button>
+                    <button [disabled]="loading || profileForm.invalid || profileForm.pristine"
+                        (click)="updateProfile()"
+                        class="flex-1 sm:flex-none justify-center px-6 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-gray-800 font-medium transition-all shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <mat-icon class="scale-75 h-5 w-5 flex items-center justify-center">save</mat-icon> Save
+                    </button>
+                    <button (click)="signOut()"
+                        class="flex-1 sm:flex-none justify-center px-6 py-2.5 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-300 font-medium transition-all flex items-center gap-2">
+                        <mat-icon class="scale-75 h-5 w-5 flex items-center justify-center">logout</mat-icon> Sign Out
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-12">
+
+                <!-- Left Column: Settings Form -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Profile Information</h2>
+                        <p class="text-gray-500 text-sm mt-1">Update your account profile details and settings.</p>
+                    </div>
+
+                    <form [formGroup]="profileForm" class="space-y-6">
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Username</label>
+                            <input formControlName="username"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-gray-400"
+                                placeholder="Enter your username" />
+                            <p class="flex items-center gap-1 mt-2 text-xs font-medium text-red-500"
+                                *ngIf="profileForm.get('username')?.invalid && (profileForm.get('username')?.dirty || profileForm.get('username')?.touched)">
+                                <mat-icon class="text-xs scale-75 h-4 w-4">error</mat-icon>
+                                <span>Username is required (min 3 chars)</span>
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Website URL</label>
+                            <input formControlName="website"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-gray-400"
+                                placeholder="https://your-website.com" />
+                        </div>
+
+                    </form>
+                </div>
+
+                <!-- Right Column: Profile Switcher -->
+                <div class="space-y-6 lg:border-l lg:border-gray-100 lg:pl-12">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Switch Profiles</h2>
+                        <p class="text-gray-500 text-sm mt-1">Manage multiple profiles associated with this account.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div *ngFor="let p of profiles" (click)="switchProfile(p)"
+                            class="group flex items-center gap-4 p-3 rounded-xl cursor-pointer border transition-all duration-200"
+                            [class.bg-blue-50]="p.username === profileForm.get('username')?.value"
+                            [class.border-blue-100]="p.username === profileForm.get('username')?.value"
+                            [class.border-transparent]="p.username !== profileForm.get('username')?.value"
+                            [class.hover:bg-gray-50]="p.username !== profileForm.get('username')?.value"
+                            [class.hover:border-gray-200]="p.username !== profileForm.get('username')?.value">
+
+                            <div class="relative shrink-0">
+                                <img *ngIf="p.avatar_url"
+                                    [src]="'https://cyolordhhjxtlmgtztkc.supabase.co/storage/v1/object/public/avatars/' + p.avatar_url"
+                                    alt="User"
+                                    class="h-12 w-12 rounded-full object-cover border border-gray-100 bg-white" />
+                                <div *ngIf="!p.avatar_url"
+                                    class="h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-lg border border-indigo-200">
+                                    {{ p.username.charAt(0) | uppercase }}
+                                </div>
+
+                                <div *ngIf="p.username === profileForm.get('username')?.value"
+                                    class="absolute -bottom-1 -right-1 h-5 w-5 bg-blue-600 rounded-full border-2 border-white flex items-center justify-center">
+                                    <mat-icon class="text-white scale-[0.4] font-bold">check</mat-icon>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 overflow-hidden">
+                                <h3 class="font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors"
+                                    [class.text-blue-700]="p.username === profileForm.get('username')?.value">
+                                    {{ p.username }}
+                                </h3>
+                                <p class="text-xs text-gray-500 truncate" *ngIf="p.website">{{ p.website }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button (click)="createNewProfile()"
+                        class="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-semibold hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/50 transition-all flex items-center justify-center gap-2 group">
+                        <div
+                            class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                            <mat-icon class="scale-75 text-gray-500 group-hover:text-blue-600">add</mat-icon>
+                        </div>
+                        Create New Profile
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Cropper Modal -->
+    <div *ngIf="showCropper" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-900">Crop Profile Picture</h3>
+                <button (click)="cancelCrop()" class="text-gray-500 hover:text-gray-700">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-auto bg-gray-900 p-4 flex items-center justify-center">
+                <image-cropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true"
+                    [aspectRatio]="1 / 1" format="png" (imageCropped)="imageCropped($event)"
+                    (imageLoaded)="imageLoaded($event)" (cropperReady)="cropperReady()"
+                    (loadImageFailed)="loadImageFailed()">
+                </image-cropper>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 flex justify-end gap-3 bg-white">
+                <button (click)="cancelCrop()"
+                    class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium">
+                    Cancel
+                </button>
+                <button (click)="saveCroppedImage()" [disabled]="!croppedImage || loading"
+                    class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    <mat-icon class="scale-75" *ngIf="!loading">check</mat-icon>
+                    <mat-spinner diameter="20" *ngIf="loading" class="inline-block"></mat-spinner>
+                    <span *ngIf="!loading">Crop & Save</span>
+                    <span *ngIf="loading">Saving...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

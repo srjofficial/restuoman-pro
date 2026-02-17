@@ -1,0 +1,20 @@
+:host {
+    display: block;
+}
+
+table {
+    width: 100%;
+}
+
+.mat-mdc-row:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.mat-column-avatar {
+    width: 60px;
+    padding-right: 0 !important;
+}
+
+.mat-column-actions {
+    width: 120px;
+}

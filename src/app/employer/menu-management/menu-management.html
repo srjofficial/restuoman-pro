@@ -1,0 +1,248 @@
+<div class="min-h-screen bg-gray-50 p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <button mat-icon-button (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <span class="text-2xl font-bold text-gray-900 ml-2">Menu Management</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Categories Panel -->
+        <div class="lg:col-span-1">
+            <mat-card>
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Categories</h2>
+                        <button mat-raised-button color="primary" (click)="toggleCategoryForm()">
+                            <mat-icon>{{ showCategoryForm ? 'close' : 'add' }}</mat-icon>
+                            {{ showCategoryForm ? 'Cancel' : 'Add' }}
+                        </button>
+                    </div>
+
+                    <!-- Category Form -->
+                    <div *ngIf="showCategoryForm" class="mb-4 p-4 bg-blue-50 rounded-lg">
+                        <h3 class="font-semibold mb-3">{{ editingCategory ? 'Edit' : 'New' }} Category</h3>
+                        <form [formGroup]="categoryForm" (ngSubmit)="saveCategory()">
+                            <mat-form-field appearance="outline" class="w-full mb-3">
+                                <mat-label>Category Name</mat-label>
+                                <input matInput formControlName="name" placeholder="e.g., Appetizers">
+                                <mat-error *ngIf="categoryForm.get('name')?.hasError('required')">
+                                    Name is required
+                                </mat-error>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" class="w-full mb-3">
+                                <mat-label>Description (Optional)</mat-label>
+                                <textarea matInput formControlName="description" rows="2"></textarea>
+                            </mat-form-field>
+
+                            <div class="flex gap-2">
+                                <button mat-stroked-button type="button" (click)="toggleCategoryForm()"
+                                    [disabled]="submittingCategory">
+                                    Cancel
+                                </button>
+                                <button mat-raised-button color="primary" type="submit" [disabled]="submittingCategory">
+                                    {{ submittingCategory ? 'Saving...' : 'Save' }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Categories List -->
+                    <div *ngIf="loadingCategories" class="text-center py-4">
+                        <p class="text-gray-500">Loading...</p>
+                    </div>
+
+                    <div *ngIf="!loadingCategories && categories.length === 0" class="text-center py-4">
+                        <p class="text-gray-500">No categories yet</p>
+                    </div>
+
+                    <div *ngIf="!loadingCategories && categories.length > 0" class="space-y-2">
+                        <div *ngFor="let category of categories"
+                            [class.bg-blue-50]="selectedCategory?.id === category.id"
+                            class="p-3 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors"
+                            (click)="selectCategory(category)">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold">{{ category.name }}</h3>
+                                    <p class="text-sm text-gray-500" *ngIf="category.description">{{
+                                        category.description }}</p>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button mat-icon-button (click)="editCategory(category); $event.stopPropagation()">
+                                        <mat-icon class="text-blue-600">edit</mat-icon>
+                                    </button>
+                                    <button mat-icon-button
+                                        (click)="deleteCategory(category); $event.stopPropagation()">
+                                        <mat-icon class="text-red-600">delete</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+
+        <!-- Menu Items Panel -->
+        <div class="lg:col-span-2">
+            <mat-card>
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">
+                            {{ selectedCategory ? selectedCategory.name + ' Items' : 'Menu Items' }}
+                        </h2>
+                        <button mat-raised-button color="primary" (click)="toggleItemForm()"
+                            [disabled]="!selectedCategory">
+                            <mat-icon>{{ showItemForm ? 'close' : 'add' }}</mat-icon>
+                            {{ showItemForm ? 'Cancel' : 'Add Item' }}
+                        </button>
+                    </div>
+
+                    <!-- Item Form -->
+                    <div *ngIf="showItemForm" class="mb-4 p-4 bg-blue-50 rounded-lg">
+                        <h3 class="font-semibold mb-3">{{ editingItem ? 'Edit' : 'New' }} Menu Item</h3>
+                        <form [formGroup]="itemForm" (ngSubmit)="saveItem()">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <mat-form-field appearance="outline" class="w-full">
+                                    <mat-label>Item Name</mat-label>
+                                    <input matInput formControlName="name" placeholder="e.g., Caesar Salad">
+                                    <mat-error *ngIf="itemForm.get('name')?.hasError('required')">
+                                        Name is required
+                                    </mat-error>
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline" class="w-full">
+                                    <mat-label>Price</mat-label>
+                                    <input matInput type="number" formControlName="price" placeholder="0.00">
+                                    <span matPrefix>₹&nbsp;</span>
+                                    <mat-error *ngIf="itemForm.get('price')?.hasError('required')">
+                                        Price is required
+                                    </mat-error>
+                                    <mat-error *ngIf="itemForm.get('price')?.hasError('min')">
+                                        Price must be positive
+                                    </mat-error>
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline" class="w-full md:col-span-2">
+                                    <mat-label>Description (Optional)</mat-label>
+                                    <textarea matInput formControlName="description" rows="2"></textarea>
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline" class="w-full md:col-span-2">
+                                    <mat-label>Key Ingredients / Allergens</mat-label>
+                                    <input matInput formControlName="ingredients"
+                                        placeholder="e.g., Peanuts, Dairy, Gluten-free">
+                                </mat-form-field>
+
+                                <div class="grid grid-cols-2 gap-3 md:col-span-2">
+                                    <mat-form-field appearance="outline" class="w-full">
+                                        <mat-label>Quantity</mat-label>
+                                        <input matInput type="number" formControlName="quantity"
+                                            placeholder="e.g., 500">
+                                    </mat-form-field>
+
+                                    <mat-form-field appearance="outline" class="w-full">
+                                        <mat-label>Unit</mat-label>
+                                        <mat-select formControlName="unit">
+                                            <mat-option value="g">Grams (g)</mat-option>
+                                            <mat-option value="kg">Kilograms (kg)</mat-option>
+                                            <mat-option value="ml">Milliliters (ml)</mat-option>
+                                            <mat-option value="l">Liters (l)</mat-option>
+                                            <mat-option value="pcs">Pieces (pcs)</mat-option>
+                                            <mat-option value="serving">Serving</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button mat-stroked-button type="button" (click)="toggleItemForm()"
+                                    [disabled]="submittingItem">
+                                    Cancel
+                                </button>
+                                <button mat-raised-button color="primary" type="submit" [disabled]="submittingItem">
+                                    {{ submittingItem ? 'Saving...' : 'Save' }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- No Category Selected -->
+                    <div *ngIf="!selectedCategory" class="text-center py-8">
+                        <mat-icon class="text-gray-300 scale-[3] mb-4">restaurant_menu</mat-icon>
+                        <p class="text-gray-500">Select a category to view items</p>
+                    </div>
+
+                    <!-- Loading Items -->
+                    <div *ngIf="selectedCategory && loadingItems" class="text-center py-8">
+                        <p class="text-gray-500">Loading items...</p>
+                    </div>
+
+                    <!-- No Items -->
+                    <div *ngIf="selectedCategory && !loadingItems && menuItems.length === 0" class="text-center py-8">
+                        <mat-icon class="text-gray-300 scale-[3] mb-4">fastfood</mat-icon>
+                        <p class="text-gray-500">No items in this category yet</p>
+                    </div>
+
+                    <!-- Items Grid -->
+                    <div *ngIf="selectedCategory && !loadingItems && menuItems.length > 0"
+                        class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div *ngFor="let item of menuItems"
+                            class="border rounded-lg overflow-hidden hover:shadow-md transition-shadow bg-white">
+                            <div *ngIf="item.image_url" class="h-40 overflow-hidden bg-gray-100">
+                                <img [src]="item.image_url" [alt]="item.name" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold text-lg">{{ item.name }}</h3>
+                                        <p class="text-sm text-gray-500 line-clamp-2" *ngIf="item.description">{{
+                                            item.description }}</p>
+
+                                        <!-- New Metadata -->
+                                        <div class="mt-2 space-y-1">
+                                            <p *ngIf="item.ingredients"
+                                                class="text-xs text-gray-500 flex items-center gap-1">
+                                                <mat-icon class="scale-75 text-amber-500">info_outline</mat-icon>
+                                                <span class="font-medium">Ingredients:</span> {{ item.ingredients }}
+                                            </p>
+                                            <p *ngIf="item.quantity"
+                                                class="text-xs text-gray-500 flex items-center gap-1">
+                                                <mat-icon class="scale-75 text-blue-500">scale</mat-icon>
+                                                <span class="font-medium">Size:</span> {{ item.quantity }}{{ item.unit
+                                                }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <button mat-icon-button (click)="editItem(item)">
+                                            <mat-icon class="text-blue-600">edit</mat-icon>
+                                        </button>
+                                        <button mat-icon-button (click)="deleteItem(item)">
+                                            <mat-icon class="text-red-600">delete</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center mt-3">
+                                    <span class="text-xl font-bold text-green-600">₹{{ item.price }}</span>
+                                    <button (click)="toggleItemAvailability(item)"
+                                        [class.bg-green-100]="item.is_available"
+                                        [class.text-green-800]="item.is_available"
+                                        [class.bg-red-100]="!item.is_available"
+                                        [class.text-red-800]="!item.is_available"
+                                        class="px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-colors">
+                                        {{ item.is_available ? 'Available' : 'Unavailable' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>

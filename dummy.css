@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.test-apply {
+    @apply flex justify-center items-center;
+}
+
+.test-blue-gray {
+    @apply bg-blue-gray-500;
+}

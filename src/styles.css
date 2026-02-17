@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import 'aos/dist/aos.css';
+
+@layer base {
+    h1 {
+        @apply text-8xl font-black text-red-600 !important;
+    }
+}
+
+
+
+/* blue-gray colors now configured in tailwind.config.js */
+
+/* Global Styles */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    scroll-behavior: smooth;
+}

@@ -6,6 +6,10 @@ A comprehensive full-stack restaurant management application built with Angular 
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat&logo=typescript)
 ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat&logo=supabase)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-06B6D4?style=flat&logo=tailwindcss)
+[![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=restuoman-pro)](https://restuoman-pro.vercel.app)
+
+## 🚀 Live Demo
+**[View Live Application](https://restuoman-pro.vercel.app)**
 
 ## 🚀 Features
 
